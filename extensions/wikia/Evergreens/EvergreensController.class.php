@@ -14,8 +14,8 @@ class EvergreensController extends WikiaController {
 	 */
 	public function log() {
 		wfProfileIn( __METHOD__ );
-		if ( $this->request->wasPosted() ) {
 
+		if ( $this->request->wasPosted() && $this->wg->EvergreensKey == $this->request->getVal( 'key', '' ) ) {
 
 			$sHeaderInfo = $this->request->getVal( 'headerInfo', null );
 
