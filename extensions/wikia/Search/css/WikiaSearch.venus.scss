@@ -293,6 +293,53 @@
 	}
 }
 
+.SearchTabsContainer {
+	background-color: $color-search-form-background;
+	@include clearfix;
+}
+
+.SearchTabs {
+	list-style: none;
+	padding: 0;
+
+	li {
+		float: left;
+		margin-right: 45px;
+
+		a {
+			display: block;
+            font-size: 16px;
+			line-height: 75px;
+
+            &:hover {
+              text-decoration: none;
+            }
+		}
+
+		&.selected {
+			position: relative;
+			&:after {
+				border: 10px solid $color-page;
+				border-top-color: $color-search-form-background;
+				// TODO mixin calc
+				left: calc( 50% - 10px );
+				top: 75px;
+				display: block;
+				content: " ";
+				position: absolute;
+			}
+
+			a {
+				font-weight: bold;
+			}
+		}
+
+		a:hover, &.selected a {
+			color: $color-text;
+		}
+	}
+}
+
 @media #{$medium-only} {
 	.body-text {
 		font-size: 16px;

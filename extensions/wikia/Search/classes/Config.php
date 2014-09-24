@@ -868,40 +868,18 @@ class Config
 	 * @return array
 	 */
 	public function getSearchProfiles() {
+
 		$nsAllSet = array_keys( $this->getService()->getSearchableNamespacesFromSearchEngine() );
 		$defaultNamespaces = $this->getService()->getDefaultNamespacesFromSearchEngine();
 
-	    $profiles = array(
-	            SEARCH_PROFILE_DEFAULT => array(
-	                    'message' => 'wikiasearch2-tabs-articles',
-	                    'tooltip' => 'searchprofile-articles-tooltip',
-	                    'namespaces' => $defaultNamespaces,
-	                    'namespace-messages' => $this->getService()->getTextForNamespaces( $defaultNamespaces ),
-	            ),
-	            SEARCH_PROFILE_IMAGES => array(
-	                    'message' => 'wikiasearch2-tabs-photos-and-videos',
-	                    'tooltip' => 'searchprofile-images-tooltip',
-	                    'namespaces' => array( NS_FILE ),
-	            ),
-	            SEARCH_PROFILE_USERS => array(
-	                    'message' => 'wikiasearch2-users',
-	                    'tooltip' => 'wikiasearch2-users-tooltip',
-	                    'namespaces' => array( NS_USER )
-	            ),
-	            SEARCH_PROFILE_ALL => array(
-	                    'message' => 'searchprofile-everything',
-	                    'tooltip' => 'searchprofile-everything-tooltip',
-	                    'namespaces' => $nsAllSet,
-	            ),
-	            SEARCH_PROFILE_ADVANCED => array(
-	                    'message' => 'searchprofile-advanced',
-	                    'tooltip' => 'searchprofile-advanced-tooltip',
-	                    'namespaces' => $this->getNamespaces(),
-	                    'parameters' => array( 'advanced' => 1 ),
-	            )
-	    );
+		if ( \F::app()->checkSkin( 'venus' ) ) {
+			$profiles = $this->getDefaultVenusProfiles( $defaultNamespaces, $nsAllSet );
+		} else {
+			$profiles = $this->getDefaultProfiles( $defaultNamespaces, $nsAllSet );
+		}
 
-	    $this->getService()->invokeHook( 'SpecialSearchProfiles', array( &$profiles ) );
+
+		$this->getService()->invokeHook( 'SpecialSearchProfiles', array( &$profiles ) );
 
 	    foreach ( $profiles as $key => &$data ) {
 	        sort( $data['namespaces'] );
@@ -921,17 +899,41 @@ class Config
 		}
 		// $nsVals should always have a value at this point
 		$nsVals = $this->getNamespaces();
+		$profileFilters = $this->getProfileFilters();
 
 		// we will always return at least SEARCH_PROFILE_ADVANCED, because it is identical to the return value of getNamespaces
 		$searchProfile = SEARCH_PROFILE_ADVANCED;
 		foreach ( $this->getSearchProfiles() as $name => $profile ) {
-			if (   ( count( array_diff( $nsVals, $profile['namespaces'] ) ) == 0 )
-				&& ( count( array_diff($profile['namespaces'], $nsVals ) ) == 0 ) ) {
+			if ( $this->compareNamespacesAndFilters( $nsVals, $profileFilters, $profile ) )
+            {
 				$searchProfile = $name !== SEARCH_PROFILE_ADVANCED ? $name : $searchProfile;
 			}
 		}
 		return $searchProfile;
 	}
+
+    /**
+     * Check if profile uses exactly the same namespaces and filters as input parasm
+     *
+     * @param array $namespaces - expected namespaces
+     * @param array $filters - expected filters
+     * @param array $profile - analyzed filter.
+     *  Structure [
+     *      'namespaces' => [0, 1, 1000, ...],
+     *      'parameters' => ['filters' => ['is_video'], ...]] // optional
+     * @return bool
+     */
+    private function compareNamespacesAndFilters($namespaces, $filters, $profile) {
+        $result = ( count( array_diff( $namespaces, $profile['namespaces'] ) ) == 0 )
+            && ( count( array_diff($profile['namespaces'], $namespaces ) ) == 0 );
+
+        if ( isset( $profile['parameters']['filters'] ) ) {
+            $result &= ( count( array_diff( $filters, $profile['parameters']['filters'] ) ) == 0 )
+                && ( count( array_diff($profile['parameters']['filters'], $filters ) ) == 0 );
+        }
+
+        return $result;
+    }
 
 	/**
 	 * Determines the number of pages based on the desired number of results per page
@@ -1315,5 +1317,96 @@ class Config
 	 */
 	public function getMainPage() {
 		return $this->mainPage;
+	}
+
+	/**
+	 * @param $defaultNamespaces
+	 * @param $nsAllSet
+	 * @return array
+	 */
+	protected function getDefaultProfiles( $defaultNamespaces, $nsAllSet ) {
+		$profiles = array(
+			SEARCH_PROFILE_DEFAULT => array(
+				'message' => 'wikiasearch2-tabs-articles',
+				'tooltip' => 'searchprofile-articles-tooltip',
+				'namespaces' => $defaultNamespaces,
+				'namespace-messages' => $this->getService()->getTextForNamespaces( $defaultNamespaces ),
+			),
+			SEARCH_PROFILE_IMAGES => array(
+				'message' => 'wikiasearch2-tabs-photos-and-videos',
+				'tooltip' => 'searchprofile-images-tooltip',
+				'namespaces' => array( NS_FILE ),
+			),
+			SEARCH_PROFILE_USERS => array(
+				'message' => 'wikiasearch2-users',
+				'tooltip' => 'wikiasearch2-users-tooltip',
+				'namespaces' => array( NS_USER )
+			), SEARCH_PROFILE_ALL => array(
+				'message' => 'searchprofile-everything',
+				'tooltip' => 'searchprofile-everything-tooltip',
+				'namespaces' => $nsAllSet,
+			),
+			SEARCH_PROFILE_ADVANCED => array(
+				'message' => 'searchprofile-advanced',
+				'tooltip' => 'searchprofile-advanced-tooltip',
+				'namespaces' => $this->getNamespaces(),
+				'parameters' => array( 'advanced' => 1 ),
+			)
+		);
+
+		return $profiles;
+	}
+
+	/**
+	 * @param $defaultNamespaces
+	 * @param $nsAllSet
+	 * @return array
+	 */
+	protected function getDefaultVenusProfiles( $defaultNamespaces, $nsAllSet ) {
+		$profiles = array(
+			SEARCH_PROFILE_ALL => array(
+				'message' => 'searchprofile-everything',
+				'tooltip' => 'searchprofile-everything-tooltip',
+				'namespaces' => $nsAllSet,
+			),
+			SEARCH_PROFILE_DEFAULT => array(
+				'message' => 'wikiasearch2-tabs-articles',
+				'tooltip' => 'searchprofile-articles-tooltip',
+				'namespaces' => $defaultNamespaces,
+				'namespace-messages' => $this->getService()->getTextForNamespaces( $defaultNamespaces ),
+			),
+			SEARCH_PROFILE_VIDEOS => array(
+				'message' => 'wikiasearch2-tabs-videos',
+				'tooltip' => 'wikiasearch2-videos-tooltip',
+				'namespaces' => array( NS_FILE ),
+				'parameters' => ['filters' => [ self::FILTER_VIDEO ] ]
+			),
+			SEARCH_PROFILE_IMAGES => array(
+				'message' => 'wikiasearch2-tabs-photos',
+				'tooltip' => 'wikiasearch2-images-tooltip',
+				'namespaces' => array( NS_FILE ),
+				'parameters' => ['filters' => [ self::FILTER_IMAGE ] ]
+			),
+			SEARCH_PROFILE_USERS => array(
+				'message' => 'wikiasearch2-users',
+				'tooltip' => 'wikiasearch2-users-tooltip',
+				'namespaces' => array( NS_USER )
+			),
+			/*
+			 * TODO implement advanced options when designs are ready
+			 SEARCH_PROFILE_ADVANCED => array(
+				'message' => 'searchprofile-advanced',
+				'tooltip' => 'searchprofile-advanced-tooltip',
+				'namespaces' => $this->getNamespaces(),
+				'parameters' => array( 'advanced' => 1 ),
+			)*/
+		);
+		return $profiles;
+	}
+
+	protected function getProfileFilters() {
+		$filters = $this->getFilterQueries();
+
+		return array_intersect( array_keys( $filters ), array_keys( $this->filterCodes ) );
 	}
 }

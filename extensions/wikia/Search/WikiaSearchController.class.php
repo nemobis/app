@@ -939,6 +939,11 @@ class WikiaSearchController extends WikiaSpecialPageController {
 		$this->setVal( 'activeTab', 		$config->getActiveTab() );
 		$this->setVal( 'form',				$form );
 		$this->setVal( 'is_video_wiki',		$is_video_wiki );
+
+
+		if ( $this->app->checkSkin( 'venus' ) ) {
+			$this->overrideTemplate( 'Venus_tabs' );
+		}
 	}
 
 	/**
