@@ -4,7 +4,9 @@ namespace Wikia\Search\Services;
 
 class NearbyPOISearchService extends EntitySearchService {
 
-	const LOCATION_FIELD_NAME = "metadata_map_location_sr";
+	const LOCATION_FIELD_NAME = "map_location_sr";
+
+	const ARTICLE_METADATA_CORE = "article_metadata";
 
 	const DEFAULT_MAX_RANGE = 300;
 
@@ -22,9 +24,15 @@ class NearbyPOISearchService extends EntitySearchService {
 
 	protected $limit;
 
+	protected $wikiaId;
+
+	protected function getCore(){
+		return self::ARTICLE_METADATA_CORE;
+	}
+
 	public function newQuery() {
 		// default fields to fetch
-		$this->fields = [ 'id', 'metadata_*', 'score' ];
+		$this->fields = [ '*', 'score' ];
 		$this->limit = self::DEFAULT_MAX_ROWS;
 		$this->radius = self::DEFAULT_MAX_RANGE;
 		$this->region = null;
@@ -44,6 +52,11 @@ class NearbyPOISearchService extends EntitySearchService {
 		if( !empty( $long ) ) {
 			$this->longitude = $long;
 		}
+		return $this;
+	}
+
+	public  function withWikiaId( $wikiaId ) {
+		$this->wikiaId = $wikiaId;
 		return $this;
 	}
 
@@ -82,11 +95,15 @@ class NearbyPOISearchService extends EntitySearchService {
 	}
 
 	protected function constructQuery() {
-		if ( empty( $this->region ) ) {
-			return $this->getGeoQuery();
-		} else {
-			return $this->getGeoQuery() . ' AND metadata_map_region_s:"' . $this->region . '"';
+		$conditions = [ ];
+		$conditions[ ] = $this->getGeoQuery();
+		if ( !empty( $this->region ) ) {
+			$conditions[ ] = 'map_region_s:"' . $this->region . '"';
 		}
+		if( !empty( $this->wikiaId ) ) {
+			$conditions[ ] = 'wid_i:"' . $this->wikiaId . '"';
+		}
+		return join( ' AND ', $conditions );
 	}
 
 	protected function getGeoQuery() {

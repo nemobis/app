@@ -436,7 +436,7 @@ class CreateWiki {
 		unset($oldUser);
 
 		if (TaskRunner::isModern('CreateWikiLocalJob')) {
-			$creationTask = new CreateNewWikiTask();
+			$creationTask = new \Wikia\Tasks\Tasks\CreateNewWikiTask();
 
 			(new \Wikia\Tasks\AsyncTaskList())
 				->wikiId($this->mNewWiki->city_id)
@@ -588,8 +588,8 @@ class CreateWiki {
 
 		// uses array_unshift to make sure hub category is first, because we take the first cat from SQL
 		if ( $this->mVertical == 2 ) array_unshift($this->mCategories, 2);	// Video games
-		if ( in_array( $this->mVertical, [1,3,4,5,6] ) ) array_unshift($this->mCategories, 3); // Entertainment
-		if ( $this->mVertical == 7 ) array_unshift($this->mCategories, 9);	// Lifestyle
+		if ( in_array( $this->mVertical, [1,3,4,6,7] ) ) array_unshift($this->mCategories, 3); // Entertainment
+		if ( $this->mVertical == 5 ) array_unshift($this->mCategories, 9);	// Lifestyle
 
 		$this->mNewWiki->categories = $this->mCategories;
 
@@ -650,7 +650,27 @@ class CreateWiki {
 	}
 
 	/**
-	 * check folder exists
+	 * Check if the given upload directory name is available for use.
+	 *
+	 * @access public
+	 * @author Michał Roszka <michal@wikia-inc.com>
+	 *
+	 * @param $sDirectoryName the path to check
+	 */
+	public static function wgUploadDirectoryExists( $sDirectoryName ) {
+		wfProfileIn( __METHOD__ );
+		$iVarId = WikiFactory::getVarIdByName( 'wgUploadDirectory' );
+
+		// Crash immediately if $iVarId is not a positive integer!
+		\Wikia\Util\Assert::true( $iVarId );
+
+		$aCityIds = WikiFactory::getCityIDsFromVarValue( $iVarId, $sDirectoryName, '=' );
+		wfProfileOut( __METHOD__ );
+		return !empty( $aCityIds );
+	}
+
+	/**
+	 * "calculates" the value for wgUploadDirectory
 	 *
 	 * @access private
 	 * @author Piotr Molski (Moli)
@@ -672,7 +692,7 @@ class CreateWiki {
 		while ( $isExist == false ) {
 			$dirName = self::IMGROOT . $prefix . "/" . $dir_base . $suffix . $dir_lang . "/images";
 
-			if ( file_exists( $dirName ) ) {
+			if ( self::wgUploadDirectoryExists($dirName) ) {
 				$suffix = rand(1, 9999);
 			}
 			else {
@@ -681,6 +701,7 @@ class CreateWiki {
 			}
 		}
 
+		wfDebug( __METHOD__ . ": Returning '{$dir_base}'\n" );
 		wfProfileOut( __METHOD__ );
 		return $dir_base;
 	}

@@ -581,7 +581,8 @@ class IvaFeedIngester extends VideoFeedIngester {
 
 				$videoAssets = $program['VideoAssets']['results'];
 				$numVideos = count( $videoAssets );
-				print( "{$program['title']} (Series:{$clipData['series']}): ");
+				$title =  $this->getTitleFromProgram( $program );
+				print( "$title (Series:{$clipData['series']}): ");
 				$this->videoFound( $numVideos );
 
 				// add video assets
@@ -691,8 +692,7 @@ class IvaFeedIngester extends VideoFeedIngester {
 
 		$clipData = array();
 
-		$program['title'] = empty( $program['DisplayTitle'] ) ? trim( $program['Title'] ) : trim( $program['DisplayTitle'] );
-		$program['title'] = $this->updateTitle( $program['title'] );
+		$program['title'] = $this->getTitleFromProgram( $program );
 
 		// get series
 		$clipData['series'] = empty( $videoParams['series'] ) ? $program['title'] : $videoParams['series'];
@@ -762,9 +762,12 @@ class IvaFeedIngester extends VideoFeedIngester {
 
 	/**
 	 * Get clip data from asset data
+	 *
 	 * @param array $videoParams
 	 * @param array $videoAsset - asset data from API
 	 * @param array|false $clipData
+	 *
+	 * @return array|bool|false
 	 */
 	protected function getDataFromAsset( $videoParams, $videoAsset, $clipData ) {
 		wfProfileIn( __METHOD__ );
@@ -1057,7 +1060,10 @@ class IvaFeedIngester extends VideoFeedIngester {
 
 	/**
 	 * Generate an MD5 hash from the IVA App Key combined with the URL and append to the URL
+	 *
 	 * @param string $url - The URL to base the hash on
+	 * @param $bitrate
+	 *
 	 * @return string $url - URL including hash value
 	 */
 	protected function generateHash( $url, $bitrate ) {
@@ -1081,4 +1087,13 @@ class IvaFeedIngester extends VideoFeedIngester {
 		return $title;
 	}
 
+	/**
+	 * Get the title of program - Entertainment Program data from API
+	 * @param array $program
+	 * @return string
+	 */
+	protected function getTitleFromProgram( array $program ) {
+		$title = empty( $program['DisplayTitle'] ) ? $program['Title'] : $program['DisplayTitle'];
+		return $this->updateTitle( trim( $title ) );
+	}
 }

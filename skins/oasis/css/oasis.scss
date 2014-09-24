@@ -8,14 +8,14 @@
 @import 'lib/foundation.custom/foundation.custom';
 
 // Mixins
-@import 'mixins/bodytext';
-@import 'mixins/border-opacity';
-@import 'mixins/box-shadow';
-@import 'mixins/clearfix';
-@import 'mixins/forms';
-@import 'mixins/gradient';
-@import 'mixins/menus';
-@import 'mixins/wordmark';
+@import 'skins/shared/mixins/bodytext';
+@import 'skins/shared/mixins/border-opacity';
+@import 'skins/shared/mixins/box-shadow';
+@import 'skins/shared/mixins/clearfix';
+@import 'skins/shared/mixins/forms';
+@import 'skins/shared/mixins/gradient';
+@import 'skins/shared/mixins/menus';
+@import 'skins/shared/mixins/wordmark';
 
 // Core
 @import 'core/buttons';
@@ -23,14 +23,13 @@
 @import 'core/autocomplete';
 @import 'core/typography';
 @import 'core/sprite';
-@import 'core/color';
+@import 'skins/shared/color';
 @import 'core/reset';
 @import 'core/modal';
 @import 'core/body';
 @import 'core/background';
 @import 'core/globalelements';
 @import 'core/GlobalHeader';
-@import 'core/AccountNavigation';
 @import 'core/page';
 @import 'core/CommentsLikes';
 @import 'core/WikiHeader';
@@ -68,7 +67,6 @@
 @import 'extensions/wikia/WikiaStyleGuide/css/Form';
 @import 'extensions/wikia/WikiaBar/css/WikiaBar';
 @import 'extensions/wikia/Chat2/css/ChatEntryPoint';
-@import 'extensions/wikia/UserLogin/css/UserLoginDropdown';
 @import 'extensions/wikia/Forum/css/RelatedForumDiscussion'; // on every article page
 @import 'extensions/wikia/TOC/css/toc.scss';
 @import 'extensions/wikia/VideosModule/styles/VideosModule';
