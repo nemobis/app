@@ -2,6 +2,11 @@
 @import 'extensions/wikia/Venus/styles/variables';
 @import 'extensions/wikia/Venus/styles/mixins';
 
+$color-search-form-background: mix($color-page, #000, 97%);
+@if $is-dark-wiki {
+	$color-search-form-background: mix($color-page, #fff, 90%);
+}
+
 @mixin video-thumbnail-size($small-columns-count, $medium-columns-count: 0, $large-columns-count: 0) {
 	@if $medium-columns-count == 0 {
 		$medium-columns-count: $small-columns-count;
