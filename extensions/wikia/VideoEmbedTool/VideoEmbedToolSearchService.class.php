@@ -216,8 +216,12 @@ class VideoEmbedToolSearchService
 
 		$helper = new VideoHandlerHelper();
 
+		// Keep track to number of videos that have no details
+		$filteredCount = 0;
+
 		foreach ( $searchResponse['items'] as $singleVideoData ) {
 			if ( empty( $singleVideoData['title'] ) ) {
+				++$filteredCount;
 				continue;
 			}
 
@@ -228,6 +232,11 @@ class VideoEmbedToolSearchService
 				$videoOptions
 			);
 
+			if ( !$videosDetail ) {
+				++$filteredCount;
+				continue;
+			}
+
 			$trimTitle = $this->getTrimTitle();
 			if ( ! empty( $trimTitle ) ) {
 				$videosDetail['fileTitle'] = mb_substr( $singleVideoData['title'], 0, $trimTitle );
@@ -237,7 +246,7 @@ class VideoEmbedToolSearchService
 		}
 
 		return [
-			'totalItemCount' => $searchResponse['total'],
+			'totalItemCount' => $searchResponse['total'] - $filteredCount,
 			'nextStartFrom' => $start + $config->getLimit(),
 			'items' => $data,
 		];
