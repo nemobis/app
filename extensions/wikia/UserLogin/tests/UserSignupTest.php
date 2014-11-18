@@ -56,53 +56,6 @@
 			}
 		}
 
-		/**
-		 * @group Slow
-		 * @slowExecutionTime 0.83832 ms
-		 * @dataProvider signupDataProvider
-		 */
-		public function testSignup( $requestParams, $mockUserParams, $mockUserLoginFormParams, $expResult, $expMsg, $expErrParam ) {
-			// setup
-			$this->setUpRequest( $requestParams );
-			$this->setUpMockObject( 'User', $mockUserParams, true );
-
-			$objectName = 'ExternalUser_Wikia';
-			$mockObject = true;
-
-			$mockExternalUser = $this->getMock($objectName, ['initFromName', 'getLocalUser', 'getId'], [], '', false);;
-
-			$mockExternalUser->expects( $this->any() )->method( 'initFromName' )
-				->willReturn($mockObject);
-			$mockExternalUser->expects( $this->any() )->method( 'getLocalUser' )
-				->willReturn($mockObject);
-			$mockExternalUser->expects( $this->any() )->method( 'getId' )
-				->willReturn((isset($objectParams['params']['mId']) ? $objectParams['params']['mId'] : 0));
-
-			if ( !is_null($mockUserLoginFormParams) ) {
-				$this->setUpMockObject( 'UserLoginForm', $mockUserLoginFormParams, true, null, array(), false );
-			}
-
-			// required to prevent Phalanx checks
-			$mockRunHooks = $this->getGlobalFunctionMock( 'wfRunHooks' );
-			$mockRunHooks->expects( $this->any() )
-				->method( 'wfRunHooks' )
-				->will( $this->returnCallback( array( $this, 'runHooksCallback' ) ) );
-
-			$this->setUpMock();
-
-			// test
-			$response = $this->app->sendRequest( 'UserSignupSpecial', 'signup' );
-
-			$responseData = $response->getVal( 'result' );
-			$this->assertEquals( $expResult, $responseData, 'result' );
-
-			$responseData = $response->getVal( 'msg' );
-			$this->assertEquals( $expMsg, $responseData, 'msg' );
-
-			$responseData = $response->getVal( 'errParam' );
-			$this->assertEquals( $expErrParam, $responseData, 'errParam' );
-		}
-
 		public function signupDataProvider() {
 			global $wgWikiaMaxNameChars;
 
