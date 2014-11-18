@@ -2076,10 +2076,6 @@ class Wikia {
 			$user->saveSettings();
 		}
 		$id = $user->getId();
-		// delete the record from all the secondary clusters
-		if ( $wgExternalAuthType == 'ExternalUser_Wikia' ) {
-			ExternalUser_Wikia::removeFromSecondaryClusters( $id );
-		}
 		$user->invalidateCache();
 
 		return true;
