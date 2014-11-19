@@ -48,6 +48,7 @@ abstract class ExternalUser {
 	 * @return mixed ExternalUser, or false on failure
 	 */
 	public static function newFromName( $name ) {
+                trigger_error( __METHOD__, E_USER_NOTICE );
 		global $wgExternalAuthType;
 		if ( is_null( $wgExternalAuthType ) ) {
 			return false;
@@ -64,6 +65,7 @@ abstract class ExternalUser {
 	 * @return mixed ExternalUser, or false on failure
 	 */
 	public static function newFromId( $id ) {
+                trigger_error( __METHOD__, E_USER_NOTICE );
 		global $wgExternalAuthType;
 		if ( is_null( $wgExternalAuthType ) ) {
 			return false;
@@ -79,6 +81,7 @@ abstract class ExternalUser {
 	 * @return mixed ExternalUser, or false on failure
 	 */
 	public static function newFromCookie() {
+                trigger_error( __METHOD__, E_USER_NOTICE );
 		global $wgExternalAuthType;
 		if ( is_null( $wgExternalAuthType ) ) {
 			return false;
@@ -101,6 +104,7 @@ abstract class ExternalUser {
 	 * @return ExternalUser|false
 	 */
 	public static function newFromUser( $user ) {
+                trigger_error( __METHOD__, E_USER_NOTICE );
 		global $wgExternalAuthType;
 		if ( is_null( $wgExternalAuthType ) ) {
 			# Short-circuit to avoid database query in common case so no one
@@ -133,6 +137,7 @@ abstract class ExternalUser {
 	 * @return mixed User or false
 	 */
 	public static function addUser( &$User, $password, $email, $realname ) {
+                trigger_error( __METHOD__, E_USER_NOTICE );
 		global $wgExternalAuthType;
 		if ( is_null( $wgExternalAuthType ) ) {
 			return false;
@@ -185,6 +190,7 @@ abstract class ExternalUser {
 	 * @return bool Success?
 	 */
 	protected function initFromCookie() {
+                trigger_error( __METHOD__, E_USER_NOTICE );
 		return false;
 	}
 
@@ -258,6 +264,7 @@ abstract class ExternalUser {
 	 * @return mixed
 	 */
 	public function getPref( $pref ) {
+                trigger_error( __METHOD__, E_USER_NOTICE );
 		return null;
 	}
 
@@ -272,6 +279,7 @@ abstract class ExternalUser {
 	 * @return array
 	 */
 	public function getGroups() {
+                trigger_error( __METHOD__, E_USER_NOTICE );
 		return array();
 	}
 
@@ -289,6 +297,7 @@ abstract class ExternalUser {
 	 * @return mixed String or false
 	 */
 	public static function getPrefMessage( $pref ) {
+                trigger_error( __METHOD__, E_USER_NOTICE );
 		return false;
 	}
 
@@ -310,6 +319,7 @@ abstract class ExternalUser {
 	 * @return bool Success?
 	 */
 	public static function setPref( $key, $value ) {
+                trigger_error( __METHOD__, E_USER_NOTICE );
 		return false;
 	}
 
@@ -324,6 +334,7 @@ abstract class ExternalUser {
 	 * @param $id int user_id
 	 */
 	protected function linkToLocal( $id ) {
+                trigger_error( __METHOD__, E_USER_NOTICE );
 		$dbw = wfGetDB( DB_MASTER );
 		$dbw->replace( 'external_user',
 			array( 'eu_local_id', 'eu_external_id' ),
@@ -338,6 +349,7 @@ abstract class ExternalUser {
 	 * @return Mixed User if the account is linked, Null otherwise.
 	 */
 	protected function getLocalUser(){
+                trigger_error( __METHOD__, E_USER_NOTICE );
 		$dbr = wfGetDB( DB_SLAVE );
 		$row = $dbr->selectRow(
 			'external_user',
@@ -353,6 +365,7 @@ abstract class ExternalUser {
 	 * set global user object in externalUser 
 	 */	
 	public function updateUser() {
+                trigger_error( __METHOD__, E_USER_NOTICE );
 		return false;
 	}
 }
