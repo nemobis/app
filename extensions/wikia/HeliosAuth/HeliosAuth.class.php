@@ -1,11 +1,6 @@
 <?php
 class HeliosAuth extends ExternalUser {
     
-    public function __construct() {
-        trigger_error( __METHOD__, E_USER_NOTICE );
-        parent::__construct();
-    }
-    
     /**
      * The method is protected in the abstract class and has been made public
      * to smooth unit testing.
@@ -15,7 +10,6 @@ class HeliosAuth extends ExternalUser {
      * @see includes/ExternalUser.php
      */
     public function initFromName( $sName ) {
-        trigger_error( __METHOD__, E_USER_NOTICE );
         return false;
     }
     
@@ -28,7 +22,6 @@ class HeliosAuth extends ExternalUser {
      * @see includes/ExternalUser.php
      */
     public function initFromId( $iId ) {
-        trigger_error( __METHOD__, E_USER_NOTICE );
         return false;
     }
     
@@ -41,7 +34,6 @@ class HeliosAuth extends ExternalUser {
      * @see includes/ExternalUser.php
      */
     public function initFromUser( $oUser ) {
-        trigger_error( __METHOD__, E_USER_NOTICE );
         return false;
     }
     
@@ -57,7 +49,6 @@ class HeliosAuth extends ExternalUser {
      * @see includes/ExternalUser.php
      */
     public function addToDatabase( $oUser, $sPassword, $sEmail, $sRealname ) {
-        trigger_error( __METHOD__, E_USER_NOTICE );
         return false;
     }
 
@@ -66,7 +57,6 @@ class HeliosAuth extends ExternalUser {
      * @see includes/ExternalUser.php
      */
     public function getId() {
-        trigger_error( __METHOD__, E_USER_NOTICE );
         return 1;
     }
     
@@ -75,7 +65,6 @@ class HeliosAuth extends ExternalUser {
      * @see includes/ExternalUser.php
      */
     public function getName() {
-        trigger_error( __METHOD__, E_USER_NOTICE );
         return 'John';
     }
     
@@ -84,7 +73,6 @@ class HeliosAuth extends ExternalUser {
      * @return boolean True on success, false otherwise
      */
     public function authenticate( $sPassword ) {
-        trigger_error( __METHOD__, E_USER_NOTICE );
         return false;
     }
 }
