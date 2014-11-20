@@ -58,7 +58,7 @@ class SpecialPasswordReset extends FormSpecialPage {
 	}
 
 	protected function getFormFields() {
-		global $wgPasswordResetRoutes, $wgAuth;
+		global $wgPasswordResetRoutes;
 		$a = array();
 		if ( isset( $wgPasswordResetRoutes['username'] ) && $wgPasswordResetRoutes['username'] ) {
 			$a['Username'] = array(
@@ -75,7 +75,7 @@ class SpecialPasswordReset extends FormSpecialPage {
 		}
 
 		if ( isset( $wgPasswordResetRoutes['domain'] ) && $wgPasswordResetRoutes['domain'] ) {
-			$domains = $wgAuth->domainList();
+			$domains = [];
 			$a['Domain'] = array(
 				'type' => 'select',
 				'options' => $domains,
@@ -121,15 +121,6 @@ class SpecialPasswordReset extends FormSpecialPage {
 	 * @return Bool|Array
 	 */
 	public function onSubmit( array $data ) {
-		global $wgAuth;
-
-		if ( isset( $data['Domain'] ) ) {
-			if ( $wgAuth->validDomain( $data['Domain'] ) ) {
-				$wgAuth->setDomain( $data['Domain'] );
-			} else {
-				$wgAuth->setDomain( 'invaliddomain' );
-			}
-		}
 
 		if( isset( $data['Capture'] ) && !$this->getUser()->isAllowed( 'passwordreset' ) ){
 			// The user knows they don't have the passwordreset permission, but they tried to spoof the form.  That's naughty
@@ -288,18 +279,13 @@ class SpecialPasswordReset extends FormSpecialPage {
 	}
 
 	protected function canChangePassword( User $user ) {
-		global $wgPasswordResetRoutes, $wgAuth;
+		global $wgPasswordResetRoutes;
 
 		// Maybe password resets are disabled, or there are no allowable routes
 		if ( !is_array( $wgPasswordResetRoutes ) ||
 			 !in_array( true, array_values( $wgPasswordResetRoutes ) ) )
 		{
 			return 'passwordreset-disabled';
-		}
-
-		// Maybe the external auth plugin won't allow local password changes
-		if ( !$wgAuth->allowPasswordChange() ) {
-			return 'resetpass_forbidden';
 		}
 
 		// Maybe the user is blocked (check this here rather than relying on the parent
