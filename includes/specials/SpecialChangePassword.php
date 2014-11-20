@@ -35,8 +35,6 @@ class SpecialChangePassword extends UnlistedSpecialPage {
 	 * Main execution point
 	 */
 	function execute( $par ) {
-		global $wgAuth;
-
 		$this->checkReadOnly();
 
 		$request = $this->getRequest();
@@ -70,11 +68,6 @@ class SpecialChangePassword extends UnlistedSpecialPage {
 			try {
 				if ( isset( $_SESSION['wsDomain'] ) ) {
 					$this->mDomain = $_SESSION['wsDomain'];
-				}
-				$wgAuth->setDomain( $this->mDomain );
-				if( !$wgAuth->allowPasswordChange() ) {
-					$this->error( $this->msg( 'resetpass_forbidden' )->text() );
-					return;
 				}
 
 				if ( !$user->isLoggedIn()
