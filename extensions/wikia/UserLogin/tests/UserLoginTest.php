@@ -322,7 +322,9 @@
 			$mockLoginFormParams1 = null;	// not mock LoginForm Object
 			$expMsg1 = wfMessage('userlogin-error-noname')->escaped();
 
-			// user is blocked
+			$reqParams2 = array( 'username' => 'WikiaUser', 'action' => 'mailpassword', 'lang' => 'en' );
+
+                        // user is blocked
 			$mockWgUserParams3 = array( 'isBlocked' => true );
 			$expMsg3 = wfMessage('userlogin-error-blocked-mailpassword')->escaped();
 
@@ -458,6 +460,9 @@
 				'loginToken' => self::LOGIN_TOKEN,
 			);
 			$mockWebRequest2 = array( 'wasPosted' => true, 'setVal' => null );
+
+			// 3 error -- POST + empty fakeGet + not allow password change
+			$expMsg3 = wfMessage( 'resetpass_forbidden' )->escaped();
 
 			// 4 redirect page -- cancel request + empty returnto
 			$params4 = array(
