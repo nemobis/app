@@ -2095,13 +2095,8 @@ class User {
 	 * @return bool
 	 */
 	public function setPassword( $str ) {
-		global $wgAuth;
-
 		if( $str !== null ) {
-			if( !$wgAuth->allowPasswordChange() ) {
-				throw new PasswordError( wfMsg( 'password-change-forbidden' ) );
-			}
-
+			
 			if( !$this->isValidPassword( $str ) ) {
 				global $wgMinimalPasswordLength;
 				$valid = $this->getPasswordValidity( $str );
@@ -2114,10 +2109,6 @@ class User {
 				}
 				throw new PasswordError( wfMsgExt( $message, array( 'parsemag' ), $params ) );
 			}
-		}
-
-		if( !$wgAuth->setPassword( $this, $str ) ) {
-			throw new PasswordError( wfMsg( 'externaldberror' ) );
 		}
 
 		$this->setInternalPassword( $str );
