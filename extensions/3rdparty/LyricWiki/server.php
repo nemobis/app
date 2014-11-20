@@ -2377,7 +2377,7 @@ function login($username, $password) {
 	$retVal = false;
 	$err = ""; // not returned to user currently... but loaded (helps at least for debug).
 	$rememberMe = false; // possibly allow this as function parameter (can SOAPs do optional params?).
-	GLOBAL $wgUser, $wgAuth, $wgReservedUsernames;
+	GLOBAL $wgUser, $wgReservedUsernames;
 
 	$username = utf8_encode($username); // allow special characters such as umlauts.
 	$password = utf8_encode($password);
@@ -2386,21 +2386,7 @@ function login($username, $password) {
 		$err .= "Please enter a username.\n";
 	} else {
 		if ( 0 == $u->getID() ) {
-			global $wgAuth;
-			/**
-			 * If the external authentication plugin allows it,
-			 * automatically create a new account for users that
-			 * are externally defined but have not yet logged in.
-			 */
-			if ( $wgAuth->autoCreate() && $wgAuth->userExists( $u->getName() ) ) {
-				if ( $wgAuth->authenticate($u->getName(), $password) ) {
-					$u =& $this->initUser( $u );
-				} else {
-					$err .= "Incorrect password.\n";
-				}
-			} else {
-				$err .= "There is no user by that username.\n";
-			}
+			$err .= "There is no user by that username.\n";
 		} else {
 			$u->loadFromDatabase();
 			if (!$u->checkPassword($password)) {
@@ -2413,7 +2399,6 @@ function login($username, $password) {
 					$r = 0;
 				}
 				$u->setOption( 'rememberpassword', $r );
-				$wgAuth->updateUser( $u );
 				$wgUser = $u;
 				$wgUser->setCookies();
 				$wgUser->saveSettings();
