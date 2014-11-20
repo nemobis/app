@@ -13,13 +13,12 @@ abstract class ApiTestCase extends MediaWikiLangTestCase {
 	protected $apiContext;
 
 	function setUp() {
-		global $wgContLang, $wgAuth, $wgMemc, $wgRequest, $wgUser, $wgServer;
+		global $wgContLang, $wgMemc, $wgRequest, $wgUser, $wgServer;
 
 		parent::setUp();
 		self::$apiUrl = $wgServer . wfScript( 'api' );
 		$wgMemc = new EmptyBagOStuff();
 		$wgContLang = Language::factory( 'en' );
-		$wgAuth = new StubObject( 'wgAuth', 'AuthPlugin' );
 		$wgRequest = new FauxRequest( array() );
 
 		self::$users = array(
