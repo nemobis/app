@@ -20,7 +20,7 @@ class UserPreferencesV2 {
 	 * @return Bool
 	 */
 	static public function onGetPreferences($user, &$defaultPreferences) {
-		global $wgEnableWallExt, $wgOut, $wgScriptPath, $wgServer, $wgUser, $wgAuth;
+		global $wgEnableWallExt, $wgOut, $wgScriptPath, $wgServer, $wgUser;
 
 		//add javascript
 		// TODO: use $wgExtensionsPath instead
@@ -108,7 +108,7 @@ class UserPreferencesV2 {
 		unset($defaultPreferences['thumbsize']);
 		unset($defaultPreferences['math']);
 		if (isset($defaultPreferences['emailaddress'])) {
-			$defaultPreferences['emailaddress']['type'] = $wgAuth->allowPropChange( 'emailaddress' ) ? 'email' : 'info' ;
+			$defaultPreferences['emailaddress']['type'] = 'email';
 			$defaultPreferences['emailaddress']['default'] = $user->getEmail() ? htmlspecialchars( $user->getEmail() ) : '' ;
 			$defaultPreferences['emailaddress']['section'] = 'emailv2/addressv2';
 			$defaultPreferences['emailaddress']['label-message'] = 'preferences-v2-my-email-address';
