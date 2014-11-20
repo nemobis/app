@@ -83,7 +83,7 @@ class SpecialUserSignup extends SpecialPage {
 	 * @param $request WebRequest object
 	 */
 	function load( $request ) {
-		global $wgAuth, $wgHiddenPrefs, $wgEnableEmail;
+		global $wgHiddenPrefs, $wgEnableEmail;
 
 		$this->mType = $request->getText( 'type' );
 		$this->mUsername = $request->getText( 'wpName' );
@@ -120,11 +120,6 @@ class SpecialUserSignup extends SpecialPage {
 		} else {
 			$this->mRealName = '';
 		}
-
-		if( !$wgAuth->validDomain( $this->mDomain ) ) {
-			$this->mDomain = 'invaliddomain';
-		}
-		$wgAuth->setDomain( $this->mDomain );
 	}
 
 	public function execute( $par ) {
@@ -249,13 +244,7 @@ class SpecialUserSignup extends SpecialPage {
 	function addNewAccountInternal() {
 		global $wgUser;
 		global $wgMemc, $wgAccountCreationThrottle;
-		global $wgAuth;
 		global $wgEmailConfirmToEdit;
-
-		// If the user passes an invalid domain, something is fishy
-		if( !$wgAuth->validDomain( $this->mDomain ) ) {
-			return self::INVALID_DOMAIN;
-		}
 
 		// If we are not allowing users to login locally, we should be checking
 		// to see if the user is actually able to authenticate to the authenti-
@@ -263,10 +252,7 @@ class SpecialUserSignup extends SpecialPage {
 		// create a local account and login as any domain user). We only need
 		// to check this for domains that aren't local.
 		if( 'local' != $this->mDomain && $this->mDomain != '' ) {
-			if( !$wgAuth->canCreateAccounts() && ( !$wgAuth->userExists( $this->mUsername )
-				|| !$wgAuth->authenticate( $this->mUsername, $this->mPassword ) ) ) {
-				return self::INVALID_DOMAIN;
-			}
+			return self::INVALID_DOMAIN;
 		}
 
 		if ( wfReadOnly() ) {
@@ -362,10 +348,6 @@ class SpecialUserSignup extends SpecialPage {
 			$wgMemc->incr( $key );
 		}
 
-		if( !$wgAuth->addUser( $tempUser, $this->mPassword, $this->mEmail, $this->mRealName ) ) {
-			return self::EXTR_DB_ERROR;
-		}
-
 		self::clearCreateaccountToken();
 
 		$tempUser = $this->initUser( $tempUser, false );
@@ -387,19 +369,12 @@ class SpecialUserSignup extends SpecialPage {
 	 * @private
 	 */
 	function initUser( $tempUser, $autocreate = false ) {
-		global $wgAuth;
-
 		$tempUser->addToDatabase();
 
-		if ( $wgAuth->allowPasswordChange() ) {
-			$tempUser->setPassword( $this->mPassword );
-		}
-
+		$tempUser->setPassword( $this->mPassword );
 		$tempUser->setEmail( $this->mEmail );
 		$tempUser->setRealName( $this->mRealName );
 		$tempUser->setToken();
-
-		$wgAuth->initUser( $tempUser, $autocreate );
 
 		if ( $this->mExtUser ) {
 			$this->mExtUser->linkToLocal( $tempUser->getId() );
@@ -630,7 +605,7 @@ class SpecialUserSignup extends SpecialPage {
 		global $wgUser, $wgOut, $wgHiddenPrefs, $wgRequest;
 		global $wgEnableEmail, $wgEnableUserEmail;
 		global $wgLoginLanguageSelector;
-		global $wgAuth, $wgEmailConfirmToEdit, $wgCookieExpiration;
+		global $wgEmailConfirmToEdit, $wgCookieExpiration;
 		global $wgSecureLogin, $wgPasswordResetRoutes;
 
 		$titleObj = SpecialPage::getTitleFor( 'Usersignup' );
@@ -709,7 +684,7 @@ class SpecialUserSignup extends SpecialPage {
 		$template->set( 'useemail', $wgEnableEmail );
 		$template->set( 'emailrequired', $wgEmailConfirmToEdit );
 		$template->set( 'emailothers', $wgEnableUserEmail );
-		$template->set( 'canreset', $wgAuth->allowPasswordChange() );
+		$template->set( 'canreset', true );
 		$template->set( 'resetlink', $resetLink );
 		$template->set( 'canremember', ( $wgCookieExpiration > 0 ) );
 		$template->set( 'usereason', $wgUser->isLoggedIn() );
@@ -734,7 +709,7 @@ class SpecialUserSignup extends SpecialPage {
 		}
 
 		// Give authentication and captcha plugins a chance to modify the form
-		$wgAuth->modifyUITemplate( $template, $this->mType );
+		$template->set( 'usedomain', false );
 
 		wfRunHooks( 'UserCreateForm', array( &$template ) );
 		wfRunHooks( 'SignupForm' );
