@@ -75,7 +75,7 @@ class LoginForm extends SpecialPage {
 	 * Loader
 	 */
 	function load() {
-		global $wgAuth, $wgHiddenPrefs, $wgEnableEmail, $wgRedirectOnLogin, $wgEnableUserLoginExt;
+		global $wgHiddenPrefs, $wgEnableEmail, $wgRedirectOnLogin, $wgEnableUserLoginExt;
 
 		if ( $this->mLoaded ) {
 			return;
@@ -132,15 +132,6 @@ class LoginForm extends SpecialPage {
 		} else {
 			$this->mRealName = '';
 		}
-
-		if( !$wgAuth->validDomain( $this->mDomain ) ) {
-			if ( isset( $_SESSION['wsDomain'] ) ) {
-				$this->mDomain = $_SESSION['wsDomain'];
-			} else {
-				$this->mDomain = 'invaliddomain';
-			}
-		}
-		$wgAuth->setDomain( $this->mDomain );
 
 		if ( empty( $wgEnableUserLoginExt ) ) {
 			$this->wpMsgPrefix = '';
@@ -350,16 +341,10 @@ class LoginForm extends SpecialPage {
 	 * Wikia change - add prefix to message key for User Login Ext
 	 */
 	function addNewAccountInternal() {
-		global $wgAuth, $wgMemc, $wgAccountCreationThrottle,
+		global $wgMemc, $wgAccountCreationThrottle,
 			$wgMinimalPasswordLength, $wgEmailConfirmToEdit;
 
 		if ( !$this->wikiaInternalCheck() ) {
-			return false;
-		}
-
-		// If the user passes an invalid domain, something is fishy
-		if( !$wgAuth->validDomain( $this->mDomain ) ) {
-			$this->mainLoginForm( $this->msg( $this->wpMsgPrefix . 'wrongpassword' )->text(), 'error', 'password' );
 			return false;
 		}
 
@@ -369,11 +354,8 @@ class LoginForm extends SpecialPage {
 		// create a local account and login as any domain user). We only need
 		// to check this for domains that aren't local.
 		if( 'local' != $this->mDomain && $this->mDomain != '' ) {
-			if( !$wgAuth->canCreateAccounts() && ( !$wgAuth->userExists( $this->mUsername )
-				|| !$wgAuth->authenticate( $this->mUsername, $this->mPassword ) ) ) {
-				$this->mainLoginForm( $this->msg( $this->wpMsgPrefix . 'wrongpassword' )->text(), 'error', 'password' );
-				return false;
-			}
+                        $this->mainLoginForm( $this->msg( $this->wpMsgPrefix . 'wrongpassword' )->text(), 'error', 'password' );
+                	return false;
 		}
 
 		if ( wfReadOnly() ) {
@@ -512,11 +494,6 @@ class LoginForm extends SpecialPage {
 			}
 		}
 
-		if( !$wgAuth->addUser( $u, $this->mPassword, $this->mEmail, $this->mRealName ) ) {
-			$this->mainLoginForm( $this->msg( $this->wpMsgPrefix . 'externaldberror' )->text() );
-			return false;
-		}
-
 		self::clearCreateaccountToken();
 		$u->mBirthDate = date( 'Y-m-d', $this->wpUserBirthDay );
 		$u = $this->initUser( $u, false );
@@ -543,7 +520,7 @@ class LoginForm extends SpecialPage {
 	 * @private
 	 */
 	function initUser( $u, $autocreate ) {
-		global $wgAuth, $wgExternalAuthType;
+		global $wgExternalAuthType;
 
 		if ( $wgExternalAuthType ) {
 			$u = ExternalUser_Wikia::addUser( $u, $this->mPassword, $this->mEmail, $this->mRealName );
@@ -554,15 +531,11 @@ class LoginForm extends SpecialPage {
 			$u->addToDatabase();
 		}
 
-		if ( $wgAuth->allowPasswordChange() ) {
-			$u->setPassword( $this->mPassword );
-		}
+		$u->setPassword( $this->mPassword );
 
 		$u->setEmail( $this->mEmail );
 		$u->setRealName( $this->mRealName );
 		$u->setToken();
-
-		$wgAuth->initUser( $u, $autocreate );
 
 		if ( is_object( $this->mExtUser ) ) {
 			$this->mExtUser->linkToLocal( $u->getId() );
@@ -592,7 +565,7 @@ class LoginForm extends SpecialPage {
 	 * creation.
 	 */
 	public function authenticateUserData() {
-		global $wgUser, $wgAuth;
+		global $wgUser;
 
 		$this->load();
 
@@ -718,7 +691,6 @@ class LoginForm extends SpecialPage {
 			// If we've enabled it, make it so that a blocked user cannot login
 			$retval = self::USER_BLOCKED;
 		} else {
-			$wgAuth->updateUser( $u );
 			$wgUser = $u;
 			// This should set it for OutputPage and the Skin
 			// which is needed or the personal links will be
@@ -792,7 +764,7 @@ class LoginForm extends SpecialPage {
 	 * @return integer Status code
 	 */
 	function attemptAutoCreate( $user ) {
-		global $wgAuth, $wgAutocreatePolicy;
+		global $wgAutocreatePolicy;
 
 		if ( $this->getUser()->isBlockedFromCreateAccount() ) {
 			wfDebug( __METHOD__ . ": user is blocked from account creation\n" );
@@ -811,19 +783,6 @@ class LoginForm extends SpecialPage {
 				return self::NOT_EXISTS;
 			}
 			if ( !$this->mExtUser->authenticate( $this->mPassword ) ) {
-				return self::WRONG_PLUGIN_PASS;
-			}
-		} else {
-			# Old AuthPlugin.
-			if ( !$wgAuth->autoCreate() ) {
-				return self::NOT_EXISTS;
-			}
-			if ( !$wgAuth->userExists( $user->getName() ) ) {
-				wfDebug( __METHOD__ . ": user does not exist\n" );
-				return self::NOT_EXISTS;
-			}
-			if ( !$wgAuth->authenticate( $user->getName(), $this->mPassword ) ) {
-				wfDebug( __METHOD__ . ": \$wgAuth->authenticate() returned false, aborting\n" );
 				return self::WRONG_PLUGIN_PASS;
 			}
 		}
@@ -938,17 +897,10 @@ class LoginForm extends SpecialPage {
 	 * @private
 	 */
 	function mailPassword() {
-		global $wgAuth;
-
 		$out = $this->getOutput();
 		if ( wfReadOnly() ) {
 			$out->readOnlyPage();
 			return false;
-		}
-
-		if( !$wgAuth->allowPasswordChange() ) {
-			$this->mainLoginForm( $this->msg( 'resetpass_forbidden' )->text() );
-			return;
 		}
 
 		$user = $this->getUser();
@@ -1208,7 +1160,7 @@ class LoginForm extends SpecialPage {
 	function mainLoginForm( $msg, $msgtype = 'error', $errParam='' ) {
 		global $wgEnableEmail, $wgEnableUserEmail;
 		global $wgHiddenPrefs, $wgLoginLanguageSelector;
-		global $wgAuth, $wgEmailConfirmToEdit, $wgCookieExpiration;
+		global $wgEmailConfirmToEdit, $wgCookieExpiration;
 		global $wgSecureLogin, $wgPasswordResetRoutes;
 		global $wgOut;
 
@@ -1303,7 +1255,7 @@ class LoginForm extends SpecialPage {
 		$template->set( 'useemail', $wgEnableEmail );
 		$template->set( 'emailrequired', $wgEmailConfirmToEdit );
 		$template->set( 'emailothers', $wgEnableUserEmail );
-		$template->set( 'canreset', $wgAuth->allowPasswordChange() );
+		$template->set( 'canreset', true );
 		$template->set( 'resetlink', $resetLink );
 		$template->set( 'canremember', ( $wgCookieExpiration > 0 ) );
 		$template->set( 'usereason', $user->isLoggedIn() );
@@ -1352,7 +1304,7 @@ class LoginForm extends SpecialPage {
 		}
 
 		// Give authentication and captcha plugins a chance to modify the form
-		$wgAuth->modifyUITemplate( $template, $this->mType );
+		$template->set( 'usedomain', false );
 		if ( $this->mType == 'signup' ) {
 			wfRunHooks( 'UserCreateForm', array( &$template ) );
 		} else {
