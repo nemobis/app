@@ -315,7 +315,7 @@ class SpecialConnect extends SpecialPage {
 	}
 
 	protected function createUser($fb_id, $name) {
-		global $wgAuth, $wgOut, $wgUser, $wgRequest, $wgMemc;
+		global $wgOut, $wgUser, $wgRequest, $wgMemc;
 		wfProfileIn(__METHOD__);
 
 		// Handle accidental reposts.
@@ -359,11 +359,9 @@ class SpecialConnect extends SpecialPage {
 			// to check this for domains that aren't local.
 			$mDomain = $wgRequest->getText( 'wpDomain' );
 			if( 'local' != $mDomain && '' != $mDomain ) {
-				if( !$wgAuth->canCreateAccounts() && ( !$wgAuth->userExists( $name ) ) ) {
-					$wgOut->showErrorPage('fbconnect-error', 'wrongpassword');
-					wfProfileOut(__METHOD__);
-					return false;
-				}
+				$wgOut->showErrorPage('fbconnect-error', 'wrongpassword');
+				wfProfileOut(__METHOD__);
+				return false;
 			}
 
 			// IP-blocking (and open proxy blocking) protection from SpecialUserLogin
@@ -411,18 +409,7 @@ class SpecialConnect extends SpecialPage {
 
 			/// END OF TYPICAL VALIDATIONS AND RESTRICITONS ON ACCOUNT-CREATION. ///
 
-
-			// Create the account (locally on main cluster or via wgAuth on other clusters).
-			$pass = $email = $realName = ""; // the real values will get filled in outside of the scope of this function.
-			$pass = null;
-			if( !$wgAuth->addUser( $user, $pass, $email, $realName ) ) {
-				wfDebug("FBConnect: Error adding new user to database.\n");
-				$wgOut->showErrorPage('fbconnect-error', 'fbconnect-errortext');
-				wfProfileOut(__METHOD__);
-				return;
-			}
-
-			// Adds the user to the local database (regardless of whether wgAuth was used).
+			// Adds the user to the local database
 			$user = $this->initUser( $user, true );
 
 			// Attach the user to their Facebook account in the database
@@ -483,7 +470,7 @@ class SpecialConnect extends SpecialPage {
 	 * @private
 	 */
 	function initUser( $u, $autocreate ) {
-		global $wgAuth, $wgExternalAuthType;
+		global $wgExternalAuthType;
 
 		if ( $wgExternalAuthType ) {
 			$u = ExternalUser::addUser( $u, $this->mPassword, $this->mEmail, $this->mRealName );
@@ -509,8 +496,6 @@ class SpecialConnect extends SpecialPage {
 
 		$u->setRealName( $this->mRealName );
 		$u->setToken();
-
-		$wgAuth->initUser( $u, $autocreate );
 
 		if ( is_object( $this->mExtUser ) ) {
 			$this->mExtUser->linkToLocal( $u->getId() );

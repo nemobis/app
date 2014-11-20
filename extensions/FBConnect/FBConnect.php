@@ -147,7 +147,7 @@ class FBConnect {
 	 * Initializes and configures the extension.
 	 */
 	public static function init() {
-		global $wgXhtmlNamespaces, $wgAuth, $wgHooks, $wgSharedTables, $wgUser;
+		global $wgXhtmlNamespaces, $wgHooks, $wgSharedTables, $wgUser;
 
 		// The xmlns:fb attribute is required for proper rendering on IE
 		$wgXhtmlNamespaces['fb'] = 'http://www.facebook.com/2008/fbml';
@@ -249,7 +249,7 @@ class FBConnect {
 	 * Fb disconect function and send mail with temp password
 	 */
 	public static function coreDisconnectFromFB($user = null){
-		global $wgRequest, $wgUser, $wgAuth;
+		global $wgRequest, $wgUser;
 
 		if($user == null) {
 			$user = $wgUser;
