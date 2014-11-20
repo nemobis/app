@@ -425,7 +425,7 @@ class RenameuserSQL {
 	 * Do the rename operation
 	 */
 	function rename() {
-		global $wgMemc, $wgAuth, $wgUpdateRowsPerJob;
+		global $wgMemc, $wgUpdateRowsPerJob;
 
 		wfProfileIn( __METHOD__ );
 
@@ -449,9 +449,7 @@ class RenameuserSQL {
 		// Reset token to break login with central auth systems.
 		// Again, avoids user being logged in with old name.
 		$user = User::newFromId( $this->uid );
-		$authUser = $wgAuth->getUserInstance( $user );
-		$authUser->resetAuthToken();
-
+		
 		// Delete from memcached.
 		$wgMemc->delete( wfMemcKey( 'user', 'id', $this->uid ) );
 
@@ -563,7 +561,6 @@ class RenameuserSQL {
 
 		// Clear caches and inform authentication plugins
 		$user = User::newFromId( $this->uid );
-		$wgAuth->updateExternalDB( $user );
 		wfRunHooks( 'RenameUserComplete', array( $this->uid, $this->old, $this->new ) );
 
 		wfProfileOut( __METHOD__ );
