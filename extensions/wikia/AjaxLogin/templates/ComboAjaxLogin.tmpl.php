@@ -1,5 +1,5 @@
 <?php
-global $wgAuth, $wgUser, $wgEnableEmail,$wgStylePath,$wgBlankImgUrl;
+global $wgUser, $wgEnableEmail,$wgStylePath,$wgBlankImgUrl;
 $isOasis = F::app()->checkSkin( ['oasis', 'venus'] );
 ?>
 <div id="AjaxLoginBox" title="<?php print wfMsg('comboajaxlogin-createlog') ?>">

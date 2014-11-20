@@ -1,6 +1,6 @@
 <?php
 	// Template for the login compontent of the ComboAjaxLogin form(s).
-	global $wgBlankImgUrl, $wgEnableEmail, $wgAuth, $wgExtensionsPath, $wgStylePath;
+	global $wgBlankImgUrl, $wgEnableEmail, $wgExtensionsPath, $wgStylePath;
 
 	$titleObj = SpecialPage::getTitleFor( 'Userlogin' );
 	$link = $titleObj->getLocalUrl('type=signup');
@@ -32,7 +32,7 @@
 	                <td id="ajaxlogin_password_cell">
 	                    <input type="password" size="20" tabindex="202" id="wpPassword2Ajax" name="wpPassword"> </input>
 	                </td>
-	            <?php if( $wgEnableEmail && $wgAuth->allowPasswordChange() ) { ?>
+	            <?php if( $wgEnableEmail ) { ?>
 						<td>
 							<a href="#" id="wpMailmypassword" onclick="AjaxLogin.mailNewPassword(this);" ><?php print wfMsg('mailmypassword') ?></a>
 						</td>

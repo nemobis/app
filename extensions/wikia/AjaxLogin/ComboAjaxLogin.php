@@ -419,7 +419,7 @@ class AjaxLoginForm extends LoginForm {
 	function mainLoginForm( $msg, $msgtype = 'error' ) {
 		global $wgUser, $wgOut, $wgHiddenPrefs, $wgEnableEmail;
 		global $wgCookiePrefix, $wgLoginLanguageSelector;
-		global $wgAuth, $wgEmailConfirmToEdit, $wgCookieExpiration, $wgEnableCOPPA;
+		global $wgEmailConfirmToEdit, $wgCookieExpiration, $wgEnableCOPPA;
 
 		$titleObj = SpecialPage::getTitleFor( 'Userlogin' );
 
@@ -466,7 +466,7 @@ class AjaxLoginForm extends LoginForm {
 		$template->set( 'userealname', !in_array( 'realname', $wgHiddenPrefs ) );
 		$template->set( 'useemail', $wgEnableEmail );
 		$template->set( 'emailrequired', $wgEmailConfirmToEdit );
-		$template->set( 'canreset', $wgAuth->allowPasswordChange() );
+		$template->set( 'canreset', true );
 		$template->set( 'canremember', ( $wgCookieExpiration > 0 ) );
 		$template->set( 'remember', $wgUser->getOption( 'rememberpassword' ) or $this->mRemember  );
 
@@ -491,8 +491,7 @@ class AjaxLoginForm extends LoginForm {
 		}
 		$template->set( 'createToken', self::getCreateaccountToken() );
 
-		// Give authentication and captcha plugins a chance to modify the form
-		$wgAuth->modifyUITemplate( $template, $this->mType );
+		$template->set( 'usedomain', false );
 
 		wfRunHooks( 'UserCreateForm', array( &$template ) );
 
