@@ -3311,27 +3311,18 @@ class User {
 	 * @return Boolean: True if the given password is correct, otherwise False.
 	 */
 	public function checkPassword( $password ) {
-		global $wgAuth, $wgLegacyEncoding;
+		global $wgLegacyEncoding;
 		$this->load();
 
 		// Even though we stop people from creating passwords that
 		// are shorter than this, doesn't mean people wont be able
 		// to. Certain authentication plugins do NOT want to save
 		// domain passwords in a mysql database, so we should
-		// check this (in case $wgAuth->strict() is false).
+		// check this.
 		if( !$this->isValidPassword( $password ) ) {
 			return false;
 		}
-
-		if( $wgAuth->authenticate( $this->getName(), $password ) ) {
-			return true;
-		} elseif( $wgAuth->strict() ) {
-			/* Auth plugin doesn't allow local authentication */
-			return false;
-		} elseif( $wgAuth->strictUserAuth( $this->getName() ) ) {
-			/* Auth plugin doesn't allow local authentication for this user name */
-			return false;
-		}
+                
 		if ( self::comparePasswords( $this->mPassword, $password, $this->mId ) ) {
 			return true;
 		} elseif ( $wgLegacyEncoding ) {
