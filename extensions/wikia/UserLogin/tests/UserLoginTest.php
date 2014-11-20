@@ -461,9 +461,6 @@
 			);
 			$mockWebRequest2 = array( 'wasPosted' => true, 'setVal' => null );
 
-			// 3 error -- POST + empty fakeGet + not allow password change
-			$expMsg3 = wfMessage( 'resetpass_forbidden' )->escaped();
-
 			// 4 redirect page -- cancel request + empty returnto
 			$params4 = array(
 				'cancel' => true,
@@ -611,8 +608,7 @@
 				array( $params1, $mockWebRequest1, $mockWgUserParams1, $mockUserParams1, $mockHelperParams1, '', '' ),
 				// 2 do nothing -- POST + not empty fakeGet
 				array( $params2, $mockWebRequest2, $mockWgUserParams1, $mockUserParams1, $mockHelperParams1, '', '' ),
-				// 3 error -- POST + empty fakeGet + not allow password change
-				array( $params1, $mockWebRequest2, $mockWgUserParams1, $mockUserParams1, $mockHelperParams1, 'error', $expMsg3 ),
+				// 3 error -- POST + empty fakeGet + not allow password change - removed along with AuthPlugin
 				// 4 redirect page -- cancel request + empty returnto
 				array( $params4, $mockWebRequest2, $mockWgUserParams1, $mockUserParams1, $mockHelperParams4, null, null ),
 				// 5 redirect page -- cancel request + returnto
