@@ -924,7 +924,6 @@ class CheckUser extends SpecialPage {
 		if ( !$dbr->numRows( $ret ) ) {
 			$s = $this->noMatchesMessage( $ip, !$xfor ) . "\n";
 		} else {
-			global $wgAuth;
 			foreach ( $ret as $row ) {
 				if ( !array_key_exists( $row->cuc_user_text, $users_edits ) ) {
 					$users_last[$row->cuc_user_text] = $row->cuc_timestamp;
@@ -976,8 +975,7 @@ class CheckUser extends SpecialPage {
 				$ip = IP::isIPAddress( $name ) ? $name : '';
 				$flags = $this->userBlockFlags( $ip, $users_ids[$name], $user );
 				# Show if account is local only
-				$authUser = $wgAuth->getUserInstance( $user );
-				if ( $user->getId() && $authUser->getId() === 0 ) {
+				if ( $user->getId() ) {
 					$flags[] = '<strong>(' . wfMsgHtml( 'checkuser-localonly' ) . ')</strong>';
 				}
 				# Check for extra user rights...
