@@ -501,9 +501,6 @@ class UserLoginSpecialController extends WikiaSpecialPageController {
 		if ( $loginForm->mUsername == '' ) {
 			$this->result = 'error';
 			$this->msg = wfMessage('userlogin-error-noname')->escaped();
-		} else if ( !$this->wg->Auth->allowPasswordChange() ) {
-			$this->result = 'error';
-			$this->msg = wfMessage('userlogin-error-resetpass_forbidden')->escaped();
 		} else if ( $this->wg->User->isBlocked() ) {
 			$this->result = 'error';
 			$this->msg = wfMessage('userlogin-error-blocked-mailpassword')->escaped();
@@ -563,12 +560,6 @@ class UserLoginSpecialController extends WikiaSpecialPageController {
 		$this->editToken = $this->wg->User->getEditToken();
 
 		if ( $this->wg->request->wasPosted() && empty($fakeGet) ) {
-			if( !$this->wg->Auth->allowPasswordChange() ) {
-				$this->result = 'error';
-				$this->msg = wfMessage( 'resetpass_forbidden' )->escaped();
-				return;
-			}
-
 			if( $this->request->getVal( 'cancel', false ) ) {
 				$this->userLoginHelper->doRedirect();
 				return;
