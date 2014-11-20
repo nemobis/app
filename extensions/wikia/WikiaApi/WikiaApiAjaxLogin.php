@@ -111,11 +111,8 @@ class WikiaApiAjaxLogin extends ApiBase {
 			$result = array ();
 			$loginForm = new LoginForm($params);
 			$loginForm->load();
-			global $wgUser, $wgOut, $wgAuth;
-			if( !$wgAuth->allowPasswordChange() ) {
-				$result['result'] = 'resetpass_forbidden';
-				$result['text'] = wfMsg('resetpass_forbidden');
-			} else if( $wgUser->isBlocked() ) {
+			global $wgUser, $wgOut;
+			if( $wgUser->isBlocked() ) {
 				$result['result'] = 'blocked-mailpassword';
 				$result['text'] = wfMsg('blocked-mailpassword');
 			} else if ( '' == $loginForm->mUsername ) {
