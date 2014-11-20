@@ -291,9 +291,8 @@
 		 * @slowExecutionTime 0.49809 ms
 		 * @dataProvider mailPasswordDataProvider
 		 */
-		public function testMailPassword( $requestParams, $mockWgUserParams, $mockAuthParams, $mockUserParams, $mockLoginFormParams, $expResult, $expMsg, $expErrParam='' ) {
+		public function testMailPassword( $requestParams, $mockWgUserParams, $mockUserParams, $mockLoginFormParams, $expResult, $expMsg, $expErrParam='' ) {
 			// setup
-			$this->setUpMockObject( 'AuthPlugin', $mockAuthParams, false, 'wgAuth' );
 			$this->setUpMockObject( 'User', $mockWgUserParams, false, 'wgUser' );
 			$this->setUpMockObject( 'User', $mockUserParams, true );
 			if ( !is_null($mockLoginFormParams) ) {
@@ -319,19 +318,16 @@
 			// empty username
 			$reqParams1 = array( 'username' => '', 'action' => 'mailpassword' );
 			$mockWgUserParams1 = null;		// not mock $wgUser
-			$mockAuthParams1 = null;		// not mock $wgAuth
 			$mockUserParams1 = null;		// not mock User Object
 			$mockLoginFormParams1 = null;	// not mock LoginForm Object
 			$expMsg1 = wfMessage('userlogin-error-noname')->escaped();
 
 			// not allow user to change password
 			$reqParams2 = array( 'username' => 'WikiaUser', 'action' => 'mailpassword', 'lang' => 'en' );
-			$mockAuthParams2 = array( 'allowPasswordChange' => false );
 			$expMsg2 = wfMessage('userlogin-error-resetpass_forbidden')->escaped();
 
 			// user is blocked
 			$mockWgUserParams3 = array( 'isBlocked' => true );
-			$mockAuthParams3 = array( 'allowPasswordChange' => true );
 			$expMsg3 = wfMessage('userlogin-error-blocked-mailpassword')->escaped();
 
 			// user not found
@@ -400,23 +396,23 @@
 
 			return array(
 				// error - empty username
-				array( $reqParams1, $mockWgUserParams1, $mockAuthParams1, $mockUserParams1, $mockLoginFormParams1, 'error', $expMsg1 ),
+				array( $reqParams1, $mockWgUserParams1, $mockUserParams1, $mockLoginFormParams1, 'error', $expMsg1 ),
 				// error - not allow user to change password
-				array( $reqParams2, $mockWgUserParams1, $mockAuthParams2, $mockUserParams1, $mockLoginFormParams1, 'error', $expMsg2 ),
+				array( $reqParams2, $mockWgUserParams1, $mockUserParams1, $mockLoginFormParams1, 'error', $expMsg2 ),
 				// error - user is blocked
-				array( $reqParams2, $mockWgUserParams3, $mockAuthParams3, $mockUserParams1, $mockLoginFormParams1, 'error', $expMsg3 ),
+				array( $reqParams2, $mockWgUserParams3, $mockUserParams1, $mockLoginFormParams1, 'error', $expMsg3 ),
 				// error - user not found
-				array( $reqParams2, $mockWgUserParams4, $mockAuthParams3, $mockUserParams4, $mockLoginFormParams1, 'error', $expMsg4 ),
+				array( $reqParams2, $mockWgUserParams4, $mockUserParams4, $mockLoginFormParams1, 'error', $expMsg4 ),
 				// error - User - invalid user (user id = 0)
-				array( $reqParams2, $mockWgUserParams4, $mockAuthParams3, $mockUserParams5, $mockLoginFormParams1, 'error', $expMsg5 ),
+				array( $reqParams2, $mockWgUserParams4, $mockUserParams5, $mockLoginFormParams1, 'error', $expMsg5 ),
 				// error - User - password reminder throttled
-				array( $reqParams2, $mockWgUserParams4, $mockAuthParams3, $mockUserParams6, $mockLoginFormParams1, 'error', $expMsg6 ),
+				array( $reqParams2, $mockWgUserParams4, $mockUserParams6, $mockLoginFormParams1, 'error', $expMsg6 ),
 				// error - User - mail error
-				array( $reqParams2, $mockWgUserParams4, $mockAuthParams3, $mockUserParams7, $mockLoginFormParams7, 'error', $expMsg7 ),
+				array( $reqParams2, $mockWgUserParams4, $mockUserParams7, $mockLoginFormParams7, 'error', $expMsg7 ),
 				// success - User - email sent
-				array( $reqParams2, $mockWgUserParams4, $mockAuthParams3, $mockUserParams7, $mockLoginFormParams8, 'ok', $expMsg8 ),
+				array( $reqParams2, $mockWgUserParams4, $mockUserParams7, $mockLoginFormParams8, 'ok', $expMsg8 ),
 				// success - Temp User - email sent
-				array( $reqParams2, $mockWgUserParams4, $mockAuthParams3, $mockUserParams9, $mockLoginFormParams8, 'ok', $expMsg8 ),
+				array( $reqParams2, $mockWgUserParams4, $mockUserParams9, $mockLoginFormParams8, 'ok', $expMsg8 ),
 			);
 		}
 
@@ -425,11 +421,10 @@
 		 * @slowExecutionTime 0.55212 ms
 		 * @dataProvider changePasswordDataProvider
 		 */
-		public function testChangePassword($params, $mockWebRequestParams, $mockWgUserParams, $mockAuthParams, $mockUserParams, $mockHelperParams, $expResult, $expMsg) {
+		public function testChangePassword($params, $mockWebRequestParams, $mockWgUserParams, $mockUserParams, $mockHelperParams, $expResult, $expMsg) {
 			// setup
 			$this->mockStaticMethod( 'UserLoginHelper', 'getLoginToken', self::LOGIN_TOKEN );
 			$this->setUpMockObject( 'WebRequest', $mockWebRequestParams, false, 'wgRequest', $params );
-			$this->setUpMockObject( 'AuthPlugin', $mockAuthParams, false, 'wgAuth' );
 			$this->setUpMockObject( 'User', $mockWgUserParams, false, 'wgUser' );
 			$this->setUpMockObject( 'User', $mockUserParams, true );
 
@@ -459,7 +454,6 @@
 			);
 			$mockWebRequest1 = array( 'wasPosted' => false );
 			$mockWgUserParams1 = null;
-			$mockAuthParams1 = null;
 			$mockUserParams1 = null;
 			$mockHelperParams1 = null;
 
@@ -472,7 +466,6 @@
 			$mockWebRequest2 = array( 'wasPosted' => true, 'setVal' => null );
 
 			// 3 error -- POST + empty fakeGet + not allow password change
-			$mockAuthParams3 = array( 'allowPasswordChange' => false );
 			$expMsg3 = wfMessage( 'resetpass_forbidden' )->escaped();
 
 			// 4 redirect page -- cancel request + empty returnto
@@ -494,7 +487,6 @@
 			);
 
 			// 6 do nothing -- not match edit token
-			$mockAuthParams6 = array( 'allowPasswordChange' => true );
 			$mockWgUserParams6 = array( 'matchEditToken' => false );
 
 			// 7 error -- real user + user not found
@@ -620,39 +612,39 @@
 
 			return array(
 				// 1 do nothing -- GET
-				array( $params1, $mockWebRequest1, $mockWgUserParams1, $mockAuthParams1, $mockUserParams1, $mockHelperParams1, '', '' ),
+				array( $params1, $mockWebRequest1, $mockWgUserParams1, $mockUserParams1, $mockHelperParams1, '', '' ),
 				// 2 do nothing -- POST + not empty fakeGet
-				array( $params2, $mockWebRequest2, $mockWgUserParams1, $mockAuthParams1, $mockUserParams1, $mockHelperParams1, '', '' ),
+				array( $params2, $mockWebRequest2, $mockWgUserParams1, $mockUserParams1, $mockHelperParams1, '', '' ),
 				// 3 error -- POST + empty fakeGet + not allow password change
-				array( $params1, $mockWebRequest2, $mockWgUserParams1, $mockAuthParams3, $mockUserParams1, $mockHelperParams1, 'error', $expMsg3 ),
+				array( $params1, $mockWebRequest2, $mockWgUserParams1, $mockUserParams1, $mockHelperParams1, 'error', $expMsg3 ),
 				// 4 redirect page -- cancel request + empty returnto
-				array( $params4, $mockWebRequest2, $mockWgUserParams1, $mockAuthParams1, $mockUserParams1, $mockHelperParams4, null, null ),
+				array( $params4, $mockWebRequest2, $mockWgUserParams1, $mockUserParams1, $mockHelperParams4, null, null ),
 				// 5 redirect page -- cancel request + returnto
-				//array( $params5, $mockWebRequest2, $mockWgUserParams1, $mockAuthParams1, $mockUserParams1, $mockHelperParams4, null, null ),
+				//array( $params5, $mockWebRequest2, $mockWgUserParams1, $mockUserParams1, $mockHelperParams4, null, null ),
 				// 6 do nothing -- not match edit token
-				array( $params1, $mockWebRequest2, $mockWgUserParams6, $mockAuthParams6, $mockUserParams1, $mockHelperParams1, '', '' ),
+				array( $params1, $mockWebRequest2, $mockWgUserParams6, $mockUserParams1, $mockHelperParams1, '', '' ),
 				// 7 error -- real user + user not found
-				array( $params1, $mockWebRequest2, $mockWgUserParams7, $mockAuthParams6, $mockUserParams7, $mockHelperParams1, 'error', $expMsg7 ),
+				array( $params1, $mockWebRequest2, $mockWgUserParams7, $mockUserParams7, $mockHelperParams1, 'error', $expMsg7 ),
 				// 8 error -- real user + anon user
-				array( $params1, $mockWebRequest2, $mockWgUserParams7, $mockAuthParams6, $mockUserParams8, $mockHelperParams1, 'error', $expMsg7 ),
+				array( $params1, $mockWebRequest2, $mockWgUserParams7, $mockUserParams8, $mockHelperParams1, 'error', $expMsg7 ),
 				// 9 error -- retype != newpassword
-				array( $params9, $mockWebRequest2, $mockWgUserParams7, $mockAuthParams6, $mockUserParams9, $mockHelperParams1, 'error', $expMsg9 ),
+				array( $params9, $mockWebRequest2, $mockWgUserParams7, $mockUserParams9, $mockHelperParams1, 'error', $expMsg9 ),
 				// 10 error --  not match temporary password (checkTemporaryPassword = false)
-				//array( $params10, $mockWebRequest2, $mockWgUserParams7, $mockAuthParams6, $mockUserParams10, $mockHelperParams1, 'error', $expMsg10 ),
+				//array( $params10, $mockWebRequest2, $mockWgUserParams7, $mockUserParams10, $mockHelperParams1, 'error', $expMsg10 ),
 				// 11 error -- not correct password (checkPassword = false)
-				//array( $params10, $mockWebRequest2, $mockWgUserParams7, $mockAuthParams6, $mockUserParams11, $mockHelperParams1, 'error', $expMsg10 ),
+				//array( $params10, $mockWebRequest2, $mockWgUserParams7, $mockUserParams11, $mockHelperParams1, 'error', $expMsg10 ),
 				// 1011 error -- [10] not match temporary password (checkTemporaryPassword = false) + [11] not correct password (checkPassword = false)
-				array( $params10, $mockWebRequest2, $mockWgUserParams7, $mockAuthParams6, $mockUserParams1011, $mockHelperParams1, 'error', $expMsg10 ),
+				array( $params10, $mockWebRequest2, $mockWgUserParams7, $mockUserParams1011, $mockHelperParams1, 'error', $expMsg10 ),
 				// 12 error -- not valid new password (passwordtooshort)
-				array( $params10, $mockWebRequest2, $mockWgUserParams7, $mockAuthParams6, $mockUserParams12, $mockHelperParams1, 'error', $expMsg12 ),
+				array( $params10, $mockWebRequest2, $mockWgUserParams7, $mockUserParams12, $mockHelperParams1, 'error', $expMsg12 ),
 				// 13 error -- not valid new password (password-name-match)
-				array( $params10, $mockWebRequest2, $mockWgUserParams7, $mockAuthParams6, $mockUserParams13, $mockHelperParams1, 'error', $expMsg13 ),
+				array( $params10, $mockWebRequest2, $mockWgUserParams7, $mockUserParams13, $mockHelperParams1, 'error', $expMsg13 ),
 				// 14 error -- not valid new password (securepasswords-invalid)
-				array( $params10, $mockWebRequest2, $mockWgUserParams7, $mockAuthParams6, $mockUserParams14, $mockHelperParams1, 'error', $expMsg14 ),
+				array( $params10, $mockWebRequest2, $mockWgUserParams7, $mockUserParams14, $mockHelperParams1, 'error', $expMsg14 ),
 				// 15 success -- real user
-				array( $params10, $mockWebRequest2, $mockWgUserParams7, $mockAuthParams6, $mockUserParams15, $mockHelperParams15, 'ok', $expMsg15 ),
+				array( $params10, $mockWebRequest2, $mockWgUserParams7, $mockUserParams15, $mockHelperParams15, 'ok', $expMsg15 ),
 				// 16 error = token mismatch
-				array( $params16, $mockWebRequest2, $mockWgUserParams7, $mockAuthParams6, $mockUserParams9, $mockHelperParams1, 'error', $expMsg16 ),
+				array( $params16, $mockWebRequest2, $mockWgUserParams7, $mockUserParams9, $mockHelperParams1, 'error', $expMsg16 ),
 
 			);
 		}
