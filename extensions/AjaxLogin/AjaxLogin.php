@@ -96,7 +96,7 @@ function efAddAjaxLoginVariables( $vars ) {
  * @return true
  */
 function GetAjaxLoginForm( &$data, $skin = null ) {
-	global $wgAuth, $wgEnableEmail, $wgOut, $wgUser;
+	global $wgEnableEmail, $wgOut, $wgUser;
 	global $wgEnableAjaxLogin;
 	if( is_null( $skin ) ) {
 		global $wgTitle;
@@ -128,7 +128,7 @@ function GetAjaxLoginForm( &$data, $skin = null ) {
 			</div>
 			<input type="submit" name="wpLoginattempt" id="wpLoginattempt" tabindex="105" value="' . wfMsg( 'login' ) . '" />' . "\n"
 		);
-		if ( $wgEnableEmail && $wgAuth->allowPasswordChange() ) {
+		if ( $wgEnableEmail ) {
 			$wgOut->addHTML( "\t\t\t" . '<br /><input type="submit" name="wpMailmypassword" id="wpMailmypassword" tabindex="106" value="' . wfMsg( 'mailmypassword' ) . '" />' . "\n\t\t\t" );
 		}
 		// Originally this used core message 'nologinlink' but it wouldn't work too well for Finnish, so I changed it. --Jack Phoenix

@@ -114,11 +114,8 @@ class ApiAjaxLogin extends ApiBase {
 			);
 			$result = array();
 			$loginForm = new LoginForm( $params );
-			global $wgUser, $wgAuth;
-			if ( !$wgAuth->allowPasswordChange() ) {
-				$result['result'] = 'resetpass_forbidden';
-				$result['text'] = wfMsg( 'resetpass_forbidden' );
-			} elseif ( $wgUser->isBlocked() ) {
+			global $wgUser;
+			if ( $wgUser->isBlocked() ) {
 				$result['result'] = 'blocked-mailpassword';
 				$result['text'] = wfMsg( 'blocked-mailpassword' );
 			} elseif ( '' == $loginForm->mName ) {
