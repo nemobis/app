@@ -15,9 +15,9 @@ class ApiUserDailyContribs extends ApiBase {
 			$this->dieUsage( 'Invalid username', 'bad_user' );
 		}
 
-		global $wgAuth, $wgUserDailyContributionsApiCheckAuthPlugin;
+		global $wgUserDailyContributionsApiCheckAuthPlugin;
 
-		if ( $wgUserDailyContributionsApiCheckAuthPlugin && !$wgAuth->userExists( $userName ) ) {
+		if ( $wgUserDailyContributionsApiCheckAuthPlugin ) {
 			$this->dieUsage( 'Specified user does not exist', 'bad_user' );
 		}
 
