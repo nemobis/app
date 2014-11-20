@@ -1753,12 +1753,7 @@ class User {
 			return $this->mHideName;
 		}
 		$this->getBlockedStatus();
-		if( !$this->mHideName ) {
-			global $wgAuth;
-			$authUser = $wgAuth->getUserInstance( $this );
-			$this->mHideName = (bool)$authUser->isHidden();
-		}
-		return $this->mHideName;
+		return (bool) $this->mHideName;
 	}
 
 	/**
