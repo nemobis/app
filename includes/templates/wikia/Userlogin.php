@@ -465,8 +465,8 @@ class UsercreateTemplate extends QuickTemplate {
 	<td id="ajaxlogin_password_cell2">
 		<input type="password" name="wpPassword" id="wpPassword2Ajax" tabindex="102" size="20" class="loginPassword" />
 	</td>
-	<?php 	global $wgEnableEmail, $wgAuth;
-		if( $wgEnableEmail && $wgAuth->allowPasswordChange() ) { ?>
+	<?php 	global $wgEnableEmail;
+		if( $wgEnableEmail ) { ?>
 	</td>
 	<?php } ?>
 	</tr>
