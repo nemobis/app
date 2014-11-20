@@ -79,7 +79,7 @@ class PBLoginForm extends LoginForm {
 	}
 
 	function successfulLogin() {
-		global $wgUser, $wgAuth,$wgOut,$wgRequest;
+		global $wgUser, $wgOut, $wgRequest;
 
 		/* post valid */
 		$u = User::newFromName( $this->mOtherName );
@@ -116,9 +116,8 @@ class PBLoginForm extends LoginForm {
 	}
 
 	function switchUser($u) {
-		global $wgUser, $wgAuth, $wgOut, $wgRequest, $wgLang;
+		global $wgUser, $wgOut, $wgRequest, $wgLang;
 		$oldUserlang = $wgUser->getOption( 'language' );
-		$wgAuth->updateUser( $u );
 		$wgUser = $u;
 		$wgUser->setCookies();
 
