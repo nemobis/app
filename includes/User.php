@@ -813,10 +813,6 @@ class User {
 			return false;
 		}
 
-		# Reject various classes of invalid names
-		global $wgAuth;
-		$name = $wgAuth->getCanonicalName( $t->getText() );
-
 		switch ( $validate ) {
 			case false:
 				break;
