@@ -32,25 +32,18 @@ class SpecialChangeEmail extends UnlistedSpecialPage {
 	}
 
 	function isListed() {
-		global $wgAuth;
-		return $wgAuth->allowPropChange( 'emailaddress' );
+		return true;
 	}
 
 	/**
 	 * Main execution point
 	 */
 	function execute( $par ) {
-		global $wgAuth;
 
 		$this->checkReadOnly();
 
 		$this->setHeaders();
 		$this->outputHeader();
-
-		if ( !$wgAuth->allowPropChange( 'emailaddress' ) ) {
-			$this->error( 'cannotchangeemail' );
-			return;
-		}
 
 		$user = $this->getUser();
 		$request = $this->getRequest();
