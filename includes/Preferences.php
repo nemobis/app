@@ -134,7 +134,7 @@ class Preferences {
 	 * @return void
 	 */
 	static function profilePreferences( $user, IContextSource $context, &$defaultPreferences ) {
-		global $wgAuth, $wgContLang, $wgParser, $wgCookieExpiration, $wgLanguageCode,
+		global $wgContLang, $wgParser, $wgCookieExpiration, $wgLanguageCode,
 			   $wgDisableTitleConversion, $wgDisableLangConversion, $wgMaxSigChars,
 			   $wgEnableEmail, $wgEmailConfirmToEdit, $wgEnableUserEmail, $wgEmailAuthentication,
 			   $wgEnotifWatchlist, $wgEnotifUserTalk, $wgEnotifRevealEditorAddress;
@@ -211,7 +211,7 @@ class Preferences {
 
 		// Actually changeable stuff
 		$defaultPreferences['realname'] = array(
-			'type' => $wgAuth->allowPropChange( 'realname' ) ? 'text' : 'info',
+			'type' => 'text',
 			'default' => $user->getRealName(),
 			'section' => 'personal/info',
 			'label-message' => 'yourrealname',
@@ -230,19 +230,18 @@ class Preferences {
 			'help-message' => 'prefs-help-gender',
 		);
 
-		if ( $wgAuth->allowPasswordChange() ) {
-			$link = Linker::link( SpecialPage::getTitleFor( 'ChangePassword' ),
-				$context->msg( 'prefs-resetpass' )->escaped(), array(),
-				array( 'returnto' => SpecialPage::getTitleFor( 'Preferences' ) ) );
+                $link = Linker::link( SpecialPage::getTitleFor( 'ChangePassword' ),
+                        $context->msg( 'prefs-resetpass' )->escaped(), array(),
+                        array( 'returnto' => SpecialPage::getTitleFor( 'Preferences' ) ) );
 
-			$defaultPreferences['password'] = array(
-				'type' => 'info',
-				'raw' => true,
-				'default' => $link,
-				'label-message' => 'yourpassword',
-				'section' => 'personal/info',
-			);
-		}
+                $defaultPreferences['password'] = array(
+                        'type' => 'info',
+                        'raw' => true,
+                        'default' => $link,
+                        'label-message' => 'yourpassword',
+                        'section' => 'personal/info',
+                );
+		
 		if ( $wgCookieExpiration > 0 ) {
 			$defaultPreferences['rememberpassword'] = array(
 				'type' => 'toggle',
@@ -320,7 +319,7 @@ class Preferences {
 			'section' => 'personal/signature',
 		);
 		$defaultPreferences['nickname'] = array(
-			'type' => $wgAuth->allowPropChange( 'nickname' ) ? 'text' : 'info',
+			'type' => 'text',
 			'maxlength' => $wgMaxSigChars,
 			'label-message' => 'yournick',
 			'validation-callback' => array( 'Preferences', 'validateSignature' ),
@@ -353,9 +352,7 @@ class Preferences {
 				array( 'returnto' => SpecialPage::getTitleFor( 'Preferences' ) ) );
 
 			$emailAddress = $user->getEmail() ? htmlspecialchars( $user->getEmail() ) : '';
-			if ( $wgAuth->allowPropChange( 'emailaddress' ) ) {
-				$emailAddress .= $emailAddress == '' ? $link : " ($link)";
-			}
+			$emailAddress .= $emailAddress == '' ? $link : " ($link)";
 
 			$defaultPreferences['emailaddress'] = array(
 				'type' => 'info',
@@ -1497,7 +1494,6 @@ class Preferences {
 	/**
 	 * Try to set a user's email address.
 	 * This does *not* try to validate the address.
-	 * Caller is responsible for checking $wgAuth.
 	 * @param $user User
 	 * @param $newaddr string New email address
 	 * @return Array (true on success or Status on failure, info string)
