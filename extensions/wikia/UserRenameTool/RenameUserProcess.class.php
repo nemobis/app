@@ -518,7 +518,7 @@ class RenameUserProcess {
 	 * @return bool True if the process succeded
 	 */
 	private function doRun() {
-		global $wgMemc, $wgAuth;
+		global $wgMemc;
 		wfProfileIn(__METHOD__);
 
 		$this->addLog("User rename global task start." . ((!empty($this->mFakeUserId)) ? ' Process is being repeated.' : null));
@@ -567,7 +567,7 @@ class RenameUserProcess {
 
 		if(empty($this->mFakeUserId)){
 
-			global $wgAuth, $wgExternalAuthType;
+			global $wgExternalAuthType;
 
 			$fakeUser = User::newFromName( $this->mOldUsername, 'creatable' );
 
