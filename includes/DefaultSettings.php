@@ -4892,12 +4892,6 @@ $wgAutoloadClasses = array();
 $wgExtensionCredits = array();
 
 /**
- * Authentication plugin.
- * @var $wgAuth AuthPlugin
- */
-$wgAuth = null;
-
-/**
  * Global list of hooks.
  * Add a hook by doing:
  *     $wgHooks['event_name'][] = $function;
