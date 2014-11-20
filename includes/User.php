@@ -1739,9 +1739,7 @@ class User {
 		if( $this->mLocked !== null ) {
 			return $this->mLocked;
 		}
-		global $wgAuth;
-		$authUser = $wgAuth->getUserInstance( $this );
-		$this->mLocked = (bool)$authUser->isLocked();
+		$this->mLocked = false;
 		return $this->mLocked;
 	}
 
