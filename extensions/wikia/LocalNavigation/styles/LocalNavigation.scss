@@ -1,3 +1,11 @@
 .local-navigation {
+	&.fixed {
+		display: block;
+		position: fixed;
+		top: 0;
+		z-index: 100000000;
+	}
+	background-color: #FF0000;
+	border: 1px solid;
 	height: 80px;
 }
