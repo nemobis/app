@@ -595,6 +595,7 @@ class LoginForm extends SpecialPage {
 	 * creation.
 	 */
 	public function authenticateUserData() {
+                \Wikia\Logger\WikiaLogger::instance()->info( __METHOD__, [ 'exception' => new Exception() ] );
 		global $wgUser, $wgAuth;
 
 		$this->load();
